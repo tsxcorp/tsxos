@@ -93,12 +93,12 @@ const { data: form } = await useAsyncData(
 					</ul>
 				</div>
 
-				<!-- <div v-if="form" class="relative">
+				<div v-if="form" class="relative">
 					<TypographyHeadline :content="`<p>Subscribe to our <em>newsletter</em></p>`" size="sm">
 						Subscribe to our newsletter
 					</TypographyHeadline>
 					<UForm class="mt-4 mb-8" :form="form" />
-				</div> -->
+				</div>
 			</nav>
 		</div>
 

@@ -34,7 +34,6 @@ export default defineNuxtConfig({
 		'@vueuse/motion/nuxt', // https://motion.vueuse.org/nuxt.html
 		'@vueuse/nuxt', // https://vueuse.org/
 		'@nuxt/icon', // https://github.com/nuxt-modules/icon
-		'@formkit/nuxt',
 	],
 
 	experimental: {

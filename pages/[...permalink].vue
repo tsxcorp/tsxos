@@ -85,18 +85,7 @@ const { data: page } = await useAsyncData(
 											],
 										},
 									],
-									block_form: [
-                                        'id',
-                                        'title',
-                                        'headline',
-                                        { 
-                                            form: [
-                                                '*', 
-                                                { fields: ['*'] } // Fetch đầy đủ thông tin fields
-                                            ] 
-                                        }
-                                    ],
-									//block_form: ['id', 'title', 'headline', { form: ['*'] }],
+									block_form: ['id', 'title', 'headline', { form: ['*'] }],
 									block_logocloud: [
 										'id',
 										'title',
