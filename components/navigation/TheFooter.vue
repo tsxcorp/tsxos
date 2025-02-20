@@ -118,34 +118,11 @@ const { data: form } = await useAsyncData(
 			</div>
 			<div class="mt-8 md:mt-0 md:order-1">
 				<span class="mt-2 text-gray-600 dark:text-gray-400">
-					Copyright © 1988 - {{ new Date().getFullYear() }}
+					Copyright © 2020 - {{ new Date().getFullYear() }}
 					<NuxtLink v-if="globals?.title" href="/" class="mx-2 hover:text-primary" rel="noopener noreferrer">
 						{{ globals.title }}.
 					</NuxtLink>
 					All rights reserved.
-				</span>
-				<!-- You're free to remove this footer if you want. But we'd appreciate it if you keep the credits. -->
-				<span class="block mt-2 text-gray-600 dark:text-gray-400">
-					<Icon name="heroicons:bolt" class="w-4 h-4 text-primary" />
-					Site powered by
-					<NuxtLink
-						href="https://www.directus.io?ref=agencyos_footer"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="border-b dark:border-b-gray-700 hover:text-primary"
-					>
-						Directus
-					</NuxtLink>
-					and
-					<NuxtLink
-						href="https://www.nuxt.com?ref=agencyos_footer"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="border-b dark:border-b-gray-700 hover:text-primary"
-					>
-						Nuxt
-					</NuxtLink>
-					.
 				</span>
 			</div>
 		</div>
