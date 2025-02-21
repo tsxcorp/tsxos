@@ -1,14 +1,12 @@
-import { theme } from '~/theme';
+import { theme as defaultTheme } from '~/theme';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-// ✅ Định nghĩa __dirname trong môi trường ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// ✅ Lấy thư mục root của project thay vì `__dirname`
+const rootDir = process.cwd();
 
-// ✅ Đọc nội dung của app.config.d.ts
-const configPath = path.resolve(__dirname, 'app.config.d.ts');
+// ✅ Đọc nội dung của `app.config.d.ts`
+const configPath = path.resolve(rootDir, 'app.config.d.ts');
 let inlineConfig = {};
 
 if (fs.existsSync(configPath)) {
@@ -25,14 +23,22 @@ if (fs.existsSync(configPath)) {
 	}
 }
 
-// ✅ Merge dữ liệu từ Directus vào app.config.ts
+// ✅ Merge `theme` từ Directus nếu có, fallback về `~/theme`
+const mergedTheme = {
+	...defaultTheme, // Dùng theme mặc định trước
+	...(inlineConfig?.globals?.theme || {}), // Ghi đè theme từ Directus nếu có
+};
+
+console.log("🎨 Theme đã merge:", mergedTheme);
+
+// ✅ Merge `app.config.d.ts` vào `app.config.ts`
 export default defineAppConfig({
-	theme,
-	...inlineConfig, // ✅ Merge từ `app.config.d.ts`
+	theme: mergedTheme,
+	...inlineConfig, // ✅ Merge toàn bộ cấu hình từ `app.config.d.ts`
 	ui: {
 		strategy: 'override',
-		primary: theme.primary,
-		gray: theme.gray,
+		primary: mergedTheme.primary,
+		gray: mergedTheme.gray,
 		notifications: {
 			position: 'top-0 right-0 bottom-auto left-auto',
 		},
@@ -58,7 +64,7 @@ export default defineAppConfig({
 			default: {
 				loadingIcon: 'material-symbols:sync-rounded',
 			},
-			rounded: `rounded-${theme.borderRadius}`,
+			rounded: `rounded-${mergedTheme.borderRadius}`,
 		},
 		select: {
 			rounded: 'rounded-input',
