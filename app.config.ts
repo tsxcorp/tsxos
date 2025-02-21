@@ -1,45 +1,13 @@
-import { theme as defaultTheme } from '~/theme';
-import fs from 'fs';
-import path from 'path';
+import { theme } from '~/theme';
 
-// ✅ Lấy thư mục root của project thay vì `__dirname`
-const rootDir = process.cwd();
-
-// ✅ Đọc nội dung của `app.config.d.ts`
-const configPath = path.resolve(rootDir, 'app.config.d.ts');
-let inlineConfig = {};
-
-if (fs.existsSync(configPath)) {
-	try {
-		const fileContent = fs.readFileSync(configPath, 'utf-8');
-
-		// ✅ Trích xuất JSON từ `declare const inlineConfig = {...}`
-		const match = fileContent.match(/declare const inlineConfig = (\{[\s\S]*?\});/);
-		if (match) {
-			inlineConfig = eval(`(${match[1]})`);
-		}
-	} catch (error) {
-		console.error("❌ Lỗi khi đọc app.config.d.ts:", error);
-	}
-}
-
-// ✅ Merge `theme` từ Directus nếu có, fallback về `~/theme`
-const mergedTheme = {
-	...defaultTheme, // Dùng theme mặc định trước
-	...(inlineConfig?.globals?.theme || {}), // Ghi đè theme từ Directus nếu có
-};
-
-console.log("🎨 Theme đã merge:", mergedTheme);
-
-// ✅ Merge `app.config.d.ts` vào `app.config.ts`
 export default defineAppConfig({
-	theme: mergedTheme,
-	...inlineConfig, // ✅ Merge toàn bộ cấu hình từ `app.config.d.ts`
+	theme,
 	ui: {
 		strategy: 'override',
-		primary: mergedTheme.primary,
-		gray: mergedTheme.gray,
+		primary: theme.primary,
+		gray: theme.gray,
 		notifications: {
+			// Show toasts at the top right of the screen
 			position: 'top-0 right-0 bottom-auto left-auto',
 		},
 		card: {
@@ -50,7 +18,9 @@ export default defineAppConfig({
 			},
 			rounded: `rounded-card`,
 		},
+
 		button: {
+			// base: 'hover:scale-105 active:hover:scale-95 transition duration-150',
 			font: 'font-bold',
 			rounded: 'rounded-button',
 			default: {
@@ -64,7 +34,7 @@ export default defineAppConfig({
 			default: {
 				loadingIcon: 'material-symbols:sync-rounded',
 			},
-			rounded: `rounded-${mergedTheme.borderRadius}`,
+			rounded: `rounded-${theme.borderRadius}`,
 		},
 		select: {
 			rounded: 'rounded-input',
@@ -103,6 +73,9 @@ export default defineAppConfig({
 			default: {
 				sortAscIcon: 'octicon:sort-asc-24',
 				sortDescIcon: 'octicon:sort-desc-24',
+				// sortButton: {
+				// 	icon: 'octicon-arrow-switch-24',
+				// },
 				loadingState: {
 					icon: 'material-symbols:sync-rounded',
 				},
