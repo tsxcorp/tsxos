@@ -1,13 +1,39 @@
 import { theme } from '~/theme';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// ✅ Định nghĩa __dirname trong môi trường ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Đọc nội dung của app.config.d.ts
+const configPath = path.resolve(__dirname, 'app.config.d.ts');
+let inlineConfig = {};
+
+if (fs.existsSync(configPath)) {
+	try {
+		const fileContent = fs.readFileSync(configPath, 'utf-8');
+
+		// ✅ Trích xuất JSON từ `declare const inlineConfig = {...}`
+		const match = fileContent.match(/declare const inlineConfig = (\{[\s\S]*?\});/);
+		if (match) {
+			inlineConfig = eval(`(${match[1]})`);
+		}
+	} catch (error) {
+		console.error("❌ Lỗi khi đọc app.config.d.ts:", error);
+	}
+}
+
+// ✅ Merge dữ liệu từ Directus vào app.config.ts
 export default defineAppConfig({
 	theme,
+	...inlineConfig, // ✅ Merge từ `app.config.d.ts`
 	ui: {
 		strategy: 'override',
 		primary: theme.primary,
 		gray: theme.gray,
 		notifications: {
-			// Show toasts at the top right of the screen
 			position: 'top-0 right-0 bottom-auto left-auto',
 		},
 		card: {
@@ -18,9 +44,7 @@ export default defineAppConfig({
 			},
 			rounded: `rounded-card`,
 		},
-
 		button: {
-			// base: 'hover:scale-105 active:hover:scale-95 transition duration-150',
 			font: 'font-bold',
 			rounded: 'rounded-button',
 			default: {
@@ -73,9 +97,6 @@ export default defineAppConfig({
 			default: {
 				sortAscIcon: 'octicon:sort-asc-24',
 				sortDescIcon: 'octicon:sort-desc-24',
-				// sortButton: {
-				// 	icon: 'octicon-arrow-switch-24',
-				// },
 				loadingState: {
 					icon: 'material-symbols:sync-rounded',
 				},
