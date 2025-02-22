@@ -77,7 +77,8 @@ watch(
 			</div>
 			<div class="flex flex-col justify-center h-full px-6 space-y-4">
 				<NavigationMobileMenuItem v-for="item in navigation.items" :key="item.id" :item="item" @close="toggle" />
-				<UButton to="/contact-us" color="primary" size="xl" class="font-display">Let's Talk</UButton>
+
+				<UButton href="/contact-us" variant="solid" size="xl" class="font-display">Let's Talk</UButton>
 			</div>
 		</Motionable>
 		<!-- Button -->
