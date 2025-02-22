@@ -28,6 +28,8 @@ useHead({
 		},
 	],
 });
+console.log("🛠 Config in Vue:", config);
+
 </script>
 <template>
 	<NuxtLayout>
