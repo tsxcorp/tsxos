@@ -1,55 +1,108 @@
-import { theme as defaultTheme } from '~/theme';
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
+import { theme } from '~/theme';
 
-// ✅ URL Directus API (Thay bằng URL thực tế của bạn)
-const DIRECTUS_API_URL = "https://app.tsx.vn/items/globals";
-
-// ✅ Hàm gọi API Directus để lấy `globals`
-async function fetchDirectusGlobals() {
-	try {
-		const response = await fetch(DIRECTUS_API_URL);
-		const data = await response.json();
-		return data?.data || {}; // Trả về `globals` từ Directus
-	} catch (error) {
-		console.error("❌ Lỗi khi lấy dữ liệu từ Directus:", error);
-		return {}; // Nếu lỗi, trả về object rỗng
-	}
-}
-
-// ✅ Xử lý merge dữ liệu
-async function generateAppConfig() {
-	console.log("🚀 Đang lấy dữ liệu `globals` từ Directus...");
-
-	// Fetch globals từ Directus
-	const directusGlobals = await fetchDirectusGlobals();
-
-	// ✅ Merge `theme` từ Directus nếu có, fallback về `~/theme`
-	const mergedTheme = {
-		primary: directusGlobals?.theme?.primary || defaultTheme.primary,
-		gray: directusGlobals?.theme?.gray || defaultTheme.gray,
-		borderRadius: directusGlobals?.theme?.borderRadius || defaultTheme.borderRadius,
-	};
-	
-
-	// ✅ Merge `globals` vào app.config.ts
-	const config = {
-		...directusGlobals, // ✅ Toàn bộ `globals` từ Directus
-		theme: mergedTheme, // ✅ Ghi đè theme từ Directus
-		ui: {
-			strategy: "merge",
-			primary: mergedTheme.primary,
-			gray: mergedTheme.gray,
+export default defineAppConfig({
+	theme,
+	ui: {
+		strategy: 'override',
+		primary: theme.primary,
+		gray: theme.gray,
+		notifications: {
+			// Show toasts at the top right of the screen
+			position: 'top-0 right-0 bottom-auto left-auto',
 		},
-	};
+		card: {
+			base: 'transition duration-200',
+			shadow: 'shadow-none',
+			body: {
+				base: 'h-full flex flex-col',
+			},
+			rounded: `rounded-card`,
+		},
 
-	console.log("🎨 Theme sau khi merge:", mergedTheme);
-	console.log("🌍 Global config sau khi merge:", config);
-
-	return config;
-}
-console.log("🚀 Config Loaded in Nuxt:", defineAppConfig);
-
-// ✅ Xuất ra `defineAppConfig` khi Nuxt build
-export default (async () => defineAppConfig(await generateAppConfig()))();
+		button: {
+			// base: 'hover:scale-105 active:hover:scale-95 transition duration-150',
+			font: 'font-bold',
+			rounded: 'rounded-button',
+			default: {
+				loadingIcon: 'material-symbols:sync-rounded',
+			},
+		},
+		badge: {
+			rounded: 'rounded-button',
+		},
+		input: {
+			default: {
+				loadingIcon: 'material-symbols:sync-rounded',
+			},
+			rounded: `rounded-${theme.borderRadius}`,
+		},
+		select: {
+			rounded: 'rounded-input',
+			default: {
+				loadingIcon: 'material-symbols:sync-rounded',
+				trailingIcon: 'material-symbols:expand-more-rounded',
+			},
+		},
+		textarea: {
+			rounded: 'rounded-input',
+		},
+		selectMenu: {
+			rounded: 'rounded-input',
+			default: {
+				selectedIcon: 'material-symbols:fitbit-check-small-rounded',
+			},
+		},
+		notification: {
+			default: {
+				closeButton: {
+					icon: 'i-octicon-x-24',
+				},
+			},
+		},
+		commandPalette: {
+			default: {
+				icon: 'material-symbols:search-rounded',
+				loadingIcon: 'material-symbols:sync-rounded',
+				selectedIcon: 'material-symbols:fitbit-check-small-rounded',
+				emptyState: {
+					icon: 'material-symbols:search-rounded',
+				},
+			},
+		},
+		table: {
+			default: {
+				sortAscIcon: 'octicon:sort-asc-24',
+				sortDescIcon: 'octicon:sort-desc-24',
+				// sortButton: {
+				// 	icon: 'octicon-arrow-switch-24',
+				// },
+				loadingState: {
+					icon: 'material-symbols:sync-rounded',
+				},
+				emptyState: {
+					icon: 'material-symbols:database-outline',
+				},
+			},
+		},
+		avatar: {
+			default: {},
+			rounded: 'rounded-button',
+		},
+		breadcrumb: {
+			default: {
+				divider: 'material-symbols:chevron-right',
+			},
+		},
+		pagination: {
+			rounded: 'first:rounded-l-button last:rounded-r-button',
+			default: {
+				prevButton: {
+					icon: 'material-symbols:arrow-back-rounded',
+				},
+				nextButton: {
+					icon: 'material-symbols:arrow-forward-rounded',
+				},
+			},
+		},
+	},
+});
