@@ -28,9 +28,6 @@ useHead({
 		},
 	],
 });
-console.log("🛠 Config in Vue:", config);
-const appConfig = useAppConfig();
-console.log("🎨 Theme từ useAppConfig:", appConfig.theme);
 
 </script>
 <template>
