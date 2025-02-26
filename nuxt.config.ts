@@ -1,138 +1,174 @@
-// import { formatFonts } from './utils/fonts';
-import { theme } from './theme';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { theme as defaultTheme, borderRadiusMap } from './theme';
 
-export default defineNuxtConfig({
-	// https://nuxt.com/docs/api/configuration/nuxt-config
+// Định nghĩa kiểu dữ liệu từ Directus
+interface DirectusData {
+  theme?: {
+    primary?: string;
+    gray?: string;
+    borderRadius?: string;
+    googleFonts?: Record<string, boolean | number[]>;
+    fonts?: {
+      display?: string;
+      sans?: string;
+      code?: string;
+      signature?: string;
+      families?: Record<string, boolean | number[]>;
+    };
+  };
+}
 
-	routeRules: {
-		// '/**': {
-		// 	prerender: true,
-		// },
-	},
+export default defineNuxtConfig(async () => {
+  const directusUrl = process.env.DIRECTUS_URL || 'http://localhost:8055';
+  let directusData: DirectusData = {}; // Khai báo biến có kiểu rõ ràng
 
-	extends: [
-		'./layers/proposals', // Proposals module
-		'./layers/portal', // Client portal module
-	],
+  try {
+    const response = await fetch(`${directusUrl}/items/globals`);
+    const json = await response.json();
+    directusData = json.data || {};
+    console.log("🔥 Directus Data fetched:", directusData);
+  } catch (error) {
+    console.error("❌ Failed to fetch Directus Data:", error);
+  }
 
-	components: [
-		// Disable prefixing base components with `Base`
-		{ path: '~/components/base', pathPrefix: false },
-		// Auto import components from `~/components`
-		'~/components',
-	],
+  // **Fix lỗi: Đảm bảo dữ liệu theme từ Directus hợp lệ**
+  const mergedTheme = {
+    primary: directusData.theme?.primary || defaultTheme.primary,
+    gray: directusData.theme?.gray || defaultTheme.gray,
+    borderRadius: directusData.theme?.borderRadius || defaultTheme.borderRadius || 'lg', // Fix lỗi undefined
+    googleFonts: directusData.theme?.googleFonts || defaultTheme.googleFonts,
+    fonts: {
+      display: directusData.theme?.fonts?.display || defaultTheme.fonts.display,
+      sans: directusData.theme?.fonts?.sans || defaultTheme.fonts.sans,
+      code: directusData.theme?.fonts?.code || defaultTheme.fonts.code,
+      signature: directusData.theme?.fonts?.signature || defaultTheme.fonts.signature,
+      families: directusData.theme?.fonts?.families || defaultTheme.fonts.families || { Inter: true }, // Fix lỗi undefined
+    },
+  };
 
-	css: ['~/assets/css/tailwind.css', '~/assets/css/main.css'],
+  // **Ghi đè file theme.ts nhưng vẫn giữ nguyên borderRadiusMap**
+  const themeContent = `export const theme = ${JSON.stringify(mergedTheme, null, 2)};
+  
+export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
+`;
 
-	modules: [
-		'@nuxt/image',
-		'@nuxt/ui', // https://ui.nuxt.com
-		'@nuxtjs/color-mode', // https://color-mode.nuxtjs.org
-		'@nuxtjs/google-fonts', // https://google-fonts.nuxtjs.org
-		'@nuxtjs/seo', // https://nuxtseo.com
-		'@formkit/auto-animate/nuxt',
-		'@vueuse/motion/nuxt', // https://motion.vueuse.org/nuxt.html
-		'@vueuse/nuxt', // https://vueuse.org/
-		'@nuxt/icon', // https://github.com/nuxt-modules/icon
-	],
+  const themePath = path.resolve('./theme.ts');
+  await fs.writeFile(themePath, themeContent, 'utf-8');
+  console.log('✅ theme.ts updated with Directus data (including borderRadiusMap)');
 
-	experimental: {
-		componentIslands: true,
-		asyncContext: true, // https://nuxt.com/docs/guide/going-further/experimental-features#asynccontext
-	},
+  return {
+    // **Cấu hình chung của Nuxt**
+    routeRules: {},
+    
+    extends: [
+      './layers/proposals', 
+      './layers/portal', 
+    ],
 
-	runtimeConfig: {
-		public: {
-			siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-		},
-	},
+    components: [
+      { path: '~/components/base', pathPrefix: false },
+      '~/components',
+    ],
 
-	// Directus Configuration
-	directus: {
-		rest: {
-			baseUrl: process.env.DIRECTUS_URL || 'http://localhost:8055',
-			nuxtBaseUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-		},
-		auth: {
-			enabled: true,
-			enableGlobalAuthMiddleware: false, // Enable auth middleware on every page
-			userFields: ['*', { contacts: ['*'] }], // Select user fields
-			redirect: {
-				login: '/auth/signin', // Path to redirect when login is required
-				logout: '/', // Path to redirect after logout
-				home: '/portal', // Path to redirect after successful login
-				resetPassword: '/auth/reset-password', // Path to redirect for password reset
-				callback: '/auth/callback', // Path to redirect after login with provider
-			},
-		},
-	},
+    css: ['~/assets/css/tailwind.css', '~/assets/css/main.css'],
 
-	// Nuxt DevTools - https://devtools.nuxtjs.org/
-	devtools: { enabled: true },
+    modules: [
+      '@nuxt/image',
+      '@nuxt/ui',
+      '@nuxtjs/color-mode',
+      '@nuxtjs/google-fonts',
+      '@nuxtjs/seo',
+      '@formkit/auto-animate/nuxt',
+      '@vueuse/motion/nuxt',
+      '@vueuse/nuxt',
+      '@nuxt/icon',
+    ],
 
-	// Color Mode Configuration - https://color-mode.nuxtjs.org/
-	colorMode: {
-		classSuffix: '', // This is so we play nice with TailwindCSS
-	},
+    experimental: {
+      componentIslands: true,
+      asyncContext: true, 
+    },
 
-	// Image Configuration - https://image.nuxt.com/providers/directus
-	image: {
-		provider: 'directus',
-		directus: {
-			baseURL: `${process.env.DIRECTUS_URL}/assets/`,
-		},
-	},
+    runtimeConfig: {
+      public: {
+        siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+        globals: directusData, 
+      },
+    },
 
-	// Google Fonts Configuration - https://google-fonts.nuxtjs.org/
-	googleFonts: {
-		families: theme.googleFonts,
-		display: 'swap',
-		download: true,
-	},
+    // **Cấu hình Directus**
+    directus: {
+      rest: {
+        baseUrl: process.env.DIRECTUS_URL || 'http://localhost:8055',
+        nuxtBaseUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      },
+      auth: {
+        enabled: true,
+        enableGlobalAuthMiddleware: false,
+        userFields: ['*', { contacts: ['*'] }],
+        redirect: {
+          login: '/auth/signin',
+          logout: '/',
+          home: '/portal',
+          resetPassword: '/auth/reset-password',
+          callback: '/auth/callback',
+        },
+      },
+    },
 
-	site: {
-		url: process.env.SITE_URL || 'http://localhost:3000',
-		name: 'AgencyOS',
-	},
+    // **Các config khác**
+    devtools: { enabled: true },
 
-	// OG Image Configuration - https://nuxtseo.com/og-image/getting-started/installation
-	ogImage: {
-		defaults: {
-			component: 'OgImageTemplate',
-			width: 1200,
-			height: 630,
-		},
-		// @TODO: Fix font families for OG Image
-		// fonts: formatFonts(fontFamilies),
-	},
+    colorMode: { classSuffix: '' },
 
-	// Sitemap Configuration - https://nuxtseo.com/sitemap/getting-started/how-it-works
-	sitemap: {
-		sitemaps: {
-			pages: {
-				exclude: ['/posts/**', '/help/**'],
-			},
-			posts: {
-				include: ['/posts/**'],
-			},
-			help: {
-				include: ['/help/**'],
-			},
-		},
-	},
+    image: {
+      provider: 'directus',
+      directus: {
+        baseURL: `${process.env.DIRECTUS_URL}/assets/`,
+      },
+    },
 
-	postcss: {
-		plugins: {
-			'postcss-import': {},
-			'tailwindcss/nesting': {},
-			tailwindcss: {},
-			autoprefixer: {},
-		},
-	},
+    googleFonts: {
+      families: mergedTheme.googleFonts,
+      display: 'swap',
+      download: true,
+    },
 
-	build: {
-		transpile: ['v-perfect-signature'],
-	},
+    site: {
+      url: process.env.SITE_URL || 'http://localhost:3000',
+      name: 'AgencyOS',
+    },
 
-	compatibilityDate: '2024-07-28',
+    ogImage: {
+      defaults: {
+        component: 'OgImageTemplate',
+        width: 1200,
+        height: 630,
+      },
+    },
+
+    sitemap: {
+      sitemaps: {
+        pages: { exclude: ['/posts/**', '/help/**'] },
+        posts: { include: ['/posts/**'] },
+        help: { include: ['/help/**'] },
+      },
+    },
+
+    postcss: {
+      plugins: {
+        'postcss-import': {},
+        'tailwindcss/nesting': {},
+        tailwindcss: {},
+        autoprefixer: {},
+      },
+    },
+
+    build: {
+      transpile: ['v-perfect-signature'],
+    },
+
+    compatibilityDate: '2024-07-28',
+  };
 });

@@ -50,7 +50,7 @@ const {
 	<header class="relative w-full mx-auto space-y-4 md:flex md:items-center md:space-y-0 md:gap-x-4">
 		<div class="flex items-center bg-gray-900 justify-between py-2 px-6 md:flex-1 rounded-card">
 			<NuxtLink href="/" class="py-2">
-				<Logo class="h-6 text-white" />
+				<Logo class="h-6 text-white" mode="dark" />
 				<span v-if="globals?.title" class="sr-only">{{ globals.title }}</span>
 			</NuxtLink>
 			<nav class="hidden md:flex md:space-x-4 lg:space-x-6" aria-label="Global">

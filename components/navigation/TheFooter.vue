@@ -118,12 +118,13 @@ const { data: form } = await useAsyncData(
 			</div>
 			<div class="mt-8 md:mt-0 md:order-1">
 				<span class="mt-2 text-gray-600 dark:text-gray-400">
-					Copyright © 2020 - {{ new Date().getFullYear() }}
+					Copyright © 1988 - {{ new Date().getFullYear() }}
 					<NuxtLink v-if="globals?.title" href="/" class="mx-2 hover:text-primary" rel="noopener noreferrer">
 						{{ globals.title }}.
 					</NuxtLink>
 					All rights reserved.
 				</span>
+
 			</div>
 		</div>
 	</footer>
