@@ -10,14 +10,6 @@ export default defineAppConfig({
   "description": "TSX Corporation is a business transformation agency committed to helping enterprises digitize workflows, optimize processes, and enhance operational efficiency. We specialize in developing scalable and automation-driven solutions that enable businesses to streamline operations, improve productivity, and drive sustainable growth. Through cutting-edge technology and tailored digital strategies, we empower organizations to navigate the digital landscape with agility and achieve long-term success.",
   "og_image": "6bf3ce5b-8d48-4aae-a067-02d458219b0e",
   "social_links": [
-    {
-      "service": "linkedin",
-      "url": "https://www.linkedin.com/company/tsxvn"
-    },
-    {
-      "service": "youtube",
-      "url": "https://www.youtube.com/@nexpovn"
-    }
   ],
   "street_address": "72 Đường Số 2, Phường Thảo Điền, Thủ Đức",
   "address_locality": "Hồ Chí Minh",
