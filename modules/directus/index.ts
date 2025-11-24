@@ -165,6 +165,12 @@ export default defineNuxtModule({
 			headers.set('Accept-Language', 'en-US,en;q=0.9');
 			headers.set('Cache-Control', 'no-cache');
 			
+			// Add static token if available (bypasses Cloudflare bot protection)
+			const staticToken = process.env.DIRECTUS_STATIC_TOKEN || process.env.DIRECTUS_SERVER_TOKEN;
+			if (staticToken) {
+				headers.set('Authorization', `Bearer ${staticToken}`);
+			}
+			
 			return fetch(url, {
 				...init,
 				headers,

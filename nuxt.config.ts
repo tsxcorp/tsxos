@@ -24,13 +24,21 @@ export default defineNuxtConfig(async () => {
   let directusData: DirectusData = {}; // Khai báo biến có kiểu rõ ràng
 
   try {
+    const headers: HeadersInit = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/json',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Cache-Control': 'no-cache',
+    };
+
+    // Add static token if available (bypasses Cloudflare bot protection)
+    const staticToken = process.env.DIRECTUS_STATIC_TOKEN || process.env.DIRECTUS_SERVER_TOKEN;
+    if (staticToken) {
+      headers['Authorization'] = `Bearer ${staticToken}`;
+    }
+
     const response = await fetch(`${directusUrl}/items/globals`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Cache-Control': 'no-cache',
-      },
+      headers,
     });
     
     if (!response.ok) {

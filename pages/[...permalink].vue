@@ -307,7 +307,6 @@ const { data: page, error } = await useAsyncData(
         block_cta: ['title', 'headline', 'content'],
         block_quote: ['title', 'subtitle', 'content'],
         block_logocloud: ['title', 'headline'],
-        block_richtext: ['title', 'headline', 'content'],
       };
 
       let translationsData = {};
