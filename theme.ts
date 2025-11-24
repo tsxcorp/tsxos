@@ -5,7 +5,7 @@ export const theme = {
   "googleFonts": {
     "Inter": true,
     "Fira Code": true,
-    "Poppins": [
+    "Be Vietnam Pro": [
       400,
       500,
       600,
@@ -16,13 +16,12 @@ export const theme = {
     "Nothing You Could Do": true
   },
   "fonts": {
-    "display": "Poppins",
     "sans": "Inter",
     "code": "Fira Code",
     "signature": "Nothing You Could Do",
     "families": {
-      "display": "Poppins",
-      "body": "Inter",
+      "display": "Be Vietnam Pro",
+      "body": "Be Vietnam Pro",
       "code": "Fira Code"
     }
   }

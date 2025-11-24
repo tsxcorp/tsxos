@@ -157,7 +157,25 @@ export default defineNuxtModule({
 		addImportsDir(composables);
 
 		// ** Build Logic **
-		const directus = createDirectus<Schema>(moduleOptions.rest.baseUrl).with(rest());
+		// Create a custom fetch function with headers to bypass Cloudflare bot protection
+		const customFetch = async (url: string | URL | Request, init?: RequestInit) => {
+			const headers = new Headers(init?.headers);
+			headers.set('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+			headers.set('Accept', 'application/json');
+			headers.set('Accept-Language', 'en-US,en;q=0.9');
+			headers.set('Cache-Control', 'no-cache');
+			
+			return fetch(url, {
+				...init,
+				headers,
+			});
+		};
+
+		const directus = createDirectus<Schema>(moduleOptions.rest.baseUrl, {
+			globals: {
+				fetch: customFetch,
+			},
+		}).with(rest());
 
 		// Handle Redirects
 		try {

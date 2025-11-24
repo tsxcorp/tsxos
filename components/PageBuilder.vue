@@ -29,6 +29,9 @@ const blocks = computed(() => {
 		return block.hide_block !== true;
 	});
 });
+
+console.log('📌 Blocks Data:', props.page.blocks);
+
 </script>
 <template>
 	<div id="content" class="mx-auto">

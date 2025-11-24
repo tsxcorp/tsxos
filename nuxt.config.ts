@@ -24,12 +24,25 @@ export default defineNuxtConfig(async () => {
   let directusData: DirectusData = {}; // Khai báo biến có kiểu rõ ràng
 
   try {
-    const response = await fetch(`${directusUrl}/items/globals`);
+    const response = await fetch(`${directusUrl}/items/globals`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const json = await response.json();
     directusData = json.data || {};
     console.log("🔥 Directus Data fetched:", directusData);
   } catch (error) {
     console.error("❌ Failed to fetch Directus Data:", error);
+    // Continue with empty data - build should not fail
   }
 
   // **Fix lỗi: Đảm bảo dữ liệu theme từ Directus hợp lệ**
@@ -39,7 +52,7 @@ export default defineNuxtConfig(async () => {
     borderRadius: directusData.theme?.borderRadius || defaultTheme.borderRadius || 'lg', // Fix lỗi undefined
     googleFonts: directusData.theme?.googleFonts || defaultTheme.googleFonts,
     fonts: {
-      display: directusData.theme?.fonts?.display || defaultTheme.fonts.display,
+      display: directusData.theme?.fonts?.display,
       sans: directusData.theme?.fonts?.sans || defaultTheme.fonts.sans,
       code: directusData.theme?.fonts?.code || defaultTheme.fonts.code,
       signature: directusData.theme?.fonts?.signature || defaultTheme.fonts.signature,
@@ -74,6 +87,7 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
     css: ['~/assets/css/tailwind.css', '~/assets/css/main.css'],
 
     modules: [
+      '@nuxtjs/i18n',
       '@nuxt/image',
       '@nuxt/ui',
       '@nuxtjs/color-mode',
@@ -84,6 +98,54 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
       '@vueuse/nuxt',
       '@nuxt/icon',
     ],
+
+    i18n: {
+      locales: [
+        { code: 'en', iso: 'en-US', name: 'English' },
+        { code: 'vi', iso: 'vi-VN', name: 'Tiếng Việt' },
+      ],
+      defaultLocale: 'en',
+      strategy: 'prefix_except_default',
+      detectBrowserLanguage: {
+        useCookie: true,
+        cookieKey: 'i18n_redirected',
+        alwaysRedirect: true,
+      },
+      pages: {
+        index: {
+          en: '/',
+          vi: '/vi',
+        },
+        'posts/[slug]': {
+          en: '/posts/:slug',
+          vi: '/vi/bai-viet/:slug',
+        },
+      },
+      dynamicRouteParams: {
+        'posts/[slug]': async (locale) => {
+          const directusLocale = locale === 'vi' ? 'vi-VN' : 'en-US';
+          console.log(`🔎 Fetching slugs for locale: ${directusLocale}`);
+  
+          const { data } = await useAsyncData(`posts-slugs-${directusLocale}`, () =>
+            useDirectus(
+              readItems('posts_translations', {
+                filter: {
+                  languages_code: { _eq: directusLocale },
+                },
+                fields: ['slug', 'posts_id'],
+              })
+            )
+          );
+  
+          const translations = data.value || [];
+          console.log(`📌 Slugs for ${directusLocale}:`, JSON.stringify(translations, null, 2));
+  
+          return translations.map((translation) => ({
+            slug: translation.slug,
+          }));
+        },
+      },
+    },
 
     experimental: {
       componentIslands: true,

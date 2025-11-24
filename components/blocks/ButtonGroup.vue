@@ -23,7 +23,7 @@ function getUrl(button: BlockButton): string | undefined {
 		<UButton
 			v-for="button in data.buttons as BlockButton[]"
 			:key="button.id"
-			:to="getUrl(button)"
+			:to="button.translatedUrl || '#'"
 			:color="button?.color"
 			:variant="button?.variant"
 			:target="button?.external_url ? '_blank' : '_self'"
