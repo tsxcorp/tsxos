@@ -40,11 +40,11 @@ export default defineNuxtConfig(async () => {
     const response = await fetch(`${directusUrl}/items/globals`, {
       headers,
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const json = await response.json();
     directusData = json.data || {};
     console.log("🔥 Directus Data fetched:", directusData);
@@ -81,10 +81,10 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
   return {
     // **Cấu hình chung của Nuxt**
     routeRules: {},
-    
+
     extends: [
-      './layers/proposals', 
-      './layers/portal', 
+      './layers/proposals',
+      './layers/portal',
     ],
 
     components: [
@@ -133,7 +133,7 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
         'posts/[slug]': async (locale) => {
           const directusLocale = locale === 'vi' ? 'vi-VN' : 'en-US';
           console.log(`🔎 Fetching slugs for locale: ${directusLocale}`);
-  
+
           const { data } = await useAsyncData(`posts-slugs-${directusLocale}`, () =>
             useDirectus(
               readItems('posts_translations', {
@@ -144,10 +144,10 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
               })
             )
           );
-  
+
           const translations = data.value || [];
           console.log(`📌 Slugs for ${directusLocale}:`, JSON.stringify(translations, null, 2));
-  
+
           return translations.map((translation) => ({
             slug: translation.slug,
           }));
@@ -157,13 +157,13 @@ export const borderRadiusMap = ${JSON.stringify(borderRadiusMap, null, 2)};
 
     experimental: {
       componentIslands: true,
-      asyncContext: true, 
+      asyncContext: true,
     },
 
     runtimeConfig: {
       public: {
         siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-        globals: directusData, 
+        globals: directusData,
       },
     },
 
